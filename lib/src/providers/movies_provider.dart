@@ -1,34 +1,32 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:pelis/src/model/pelicula_model.dart';
+import 'package:pelis/src/model/movies_model.dart';
 import 'package:http/http.dart' as http;
 
-class PeliculasProvider {
+class MoviesProvider {
   String _apiKey = 'f08a0d4cc5d0cdc4094ce09bf883048f';
   String _endpoint = 'api.themoviedb.org';
   String _lang = 'es-MX';
   int _page = 0;
-  List<Pelicula> _populares = List<Pelicula>();
+  List<Movie> _populares = List<Movie>();
   bool _loading = false;
 
-  final _popularesStreamController =
-      StreamController<List<Pelicula>>.broadcast();
-  Function(List<Pelicula>) get popularSink =>
-      _popularesStreamController.sink.add;
-  Stream<List<Pelicula>> get popularStream => _popularesStreamController.stream;
+  final _popularesStreamController = StreamController<List<Movie>>.broadcast();
+  Function(List<Movie>) get popularSink => _popularesStreamController.sink.add;
+  Stream<List<Movie>> get popularStream => _popularesStreamController.stream;
 
   void disposeStreams() {
     _popularesStreamController.close();
   }
 
-  Future<List<Pelicula>> getNowPlaying() async {
+  Future<List<Movie>> getNowPlaying() async {
     Map<String, String> parameters = {'api_key': _apiKey, 'language': _lang};
     final url = Uri.https(_endpoint, '3/movie/now_playing', parameters);
     return await _processResponse(url);
   }
 
-  Future<List<Pelicula>> getPopular() async {
+  Future<List<Movie>> getPopular() async {
     if (_loading) return [];
     _loading = true;
     _page++;
@@ -48,10 +46,20 @@ class PeliculasProvider {
     return response;
   }
 
-  Future<List<Pelicula>> _processResponse(Uri url) async {
+  Future<List<Movie>> getMovie(String nameish) async {
+    Map<String, String> parameters = {
+      'api_key': _apiKey,
+      'language': _lang,
+      'query': nameish
+    };
+    final url = Uri.https(_endpoint, '3/search/movie', parameters);
+    return await _processResponse(url);
+  }
+
+  Future<List<Movie>> _processResponse(Uri url) async {
     final response = await http.get(url);
     final decoded = json.decode(response.body);
-    final peliculas = new Peliculas.fromJsonList(decoded['results']);
-    return peliculas.peliculas;
+    final movies = new Movies.fromJsonList(decoded['results']);
+    return movies.movies;
   }
 }

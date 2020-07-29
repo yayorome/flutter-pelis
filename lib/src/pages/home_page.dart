@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:pelis/src/providers/peliculas_provider.dart';
+import 'package:pelis/src/delegates/search_delegate.dart';
+import 'package:pelis/src/providers/movies_provider.dart';
 import 'package:pelis/src/widgets/card_swiper_widget.dart';
 import 'package:pelis/src/widgets/movie_horizontal_widget.dart';
 
 class HomePage extends StatelessWidget {
-  final peliculasProvider = PeliculasProvider();
+  final moviesProvider = MoviesProvider();
 
   @override
   Widget build(BuildContext context) {
-    peliculasProvider.getPopular();
+    moviesProvider.getPopular();
     return Scaffold(
       appBar: AppBar(
         title: Text('Peliculas Recientes'),
         centerTitle: false,
         backgroundColor: Colors.indigoAccent,
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.search), onPressed: () {})
+          IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                showSearch(context: context, delegate: DataSearch());
+              })
         ],
       ),
       body: Container(
@@ -29,7 +34,7 @@ class HomePage extends StatelessWidget {
 
   Widget _swiperTarjetas() {
     return FutureBuilder(
-      future: peliculasProvider.getNowPlaying(),
+      future: moviesProvider.getNowPlaying(),
       builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
         if (snapshot.hasData) {
           return CardSwiperWidget(cardList: snapshot.data);
@@ -58,12 +63,12 @@ class HomePage extends StatelessWidget {
             height: 5,
           ),
           StreamBuilder(
-            stream: peliculasProvider.popularStream,
+            stream: moviesProvider.popularStream,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.hasData) {
                 return MovieHorizontalWidget(
                     peliculas: snapshot.data,
-                    nextPage: peliculasProvider.getPopular);
+                    nextPage: moviesProvider.getPopular);
               } else {
                 return Container(
                     height: 340,

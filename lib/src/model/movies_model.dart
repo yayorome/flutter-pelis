@@ -1,18 +1,19 @@
-class Peliculas {
-  List<Pelicula> peliculas = List<Pelicula>();
+class Movies {
+  List<Movie> movies = List<Movie>();
 
-  Peliculas();
+  Movies();
 
-  Peliculas.fromJsonList(List<dynamic> jsonList) {
+  Movies.fromJsonList(List<dynamic> jsonList) {
     if (jsonList == null) return;
 
     jsonList.forEach((element) {
-      peliculas.add(new Pelicula.fromJsonMap(element));
+      movies.add(new Movie.fromJsonMap(element));
     });
   }
 }
 
-class Pelicula {
+class Movie {
+  String uid;
   double popularity;
   int voteCount;
   bool video;
@@ -28,7 +29,7 @@ class Pelicula {
   String overview;
   String releaseDate;
 
-  Pelicula({
+  Movie({
     this.popularity,
     this.voteCount,
     this.video,
@@ -45,7 +46,7 @@ class Pelicula {
     this.releaseDate,
   });
 
-  Pelicula.fromJsonMap(Map<String, dynamic> json) {
+  Movie.fromJsonMap(Map<String, dynamic> json) {
     popularity = json['popularity'] / 1;
     voteCount = json['vote_count'];
     video = json['video'];
@@ -67,6 +68,14 @@ class Pelicula {
       return 'https://cdn.pixabay.com/photo/2018/06/26/01/20/connection-lost-3498366_960_720.png';
     } else {
       return 'https://image.tmdb.org/t/p/w500/$posterPath';
+    }
+  }
+
+  getBackGroundImg() {
+    if (backdropPath == null) {
+      return 'https://cdn.pixabay.com/photo/2018/06/26/01/20/connection-lost-3498366_960_720.png';
+    } else {
+      return 'https://image.tmdb.org/t/p/w500/$backdropPath';
     }
   }
 }
